@@ -1,0 +1,37 @@
+yandex_geocode <- function(x, apikey, ...) {
+  start_time <- Sys.time()
+  require(tidyverse)
+  require(xml2)
+  geo_find <- function(geocode, rspn = 0, bbox = NULL, coord_left_low, coord_right_up) {
+    #Combine a complete url for request
+    geocode <- paste(unlist(strsplit(geocode, split = " ")), collapse = "+")
+    if (rspn > 0 & is.null(bbox) == FALSE) {
+      coord1 <- unlist(strsplit(coord_left_low, split = ", "))
+      coord1 <- paste(coord1[2], coord1[1], sep = ",")
+      coord2 <- unlist(strsplit(coord_right_up, split = ", "))
+      coord2 <- paste(coord2[2], coord2[1], sep = ",")
+      url <- gsub(" ", "", paste('https://geocode-maps.yandex.ru/1.x?apikey=', apikey, "&geocode=", geocode, "&rspn=", rspn, "&bbox=", coord1, "~", coord2, collapse = ""))
+      } else {
+        url <- gsub(" ", "", paste('https://geocode-maps.yandex.ru/1.x?apikey=', apikey, "&geocode=", geocode, collapse = ""))
+    }
+    result <- as_list(read_xml(url))
+    result_to_parse <- result$ymaps$GeoObjectCollection$featureMember$GeoObject$metaDataProperty$GeocoderMetaData
+    found_add <- vector('character', length = 9)
+    found_add <- unlist(lapply(list(result_to_parse$text,
+                          result[["ymaps"]][["GeoObjectCollection"]][["featureMember"]][["GeoObject"]][["Point"]][["pos"]][[1]],
+                          result_to_parse$kind,
+                          result_to_parse$precision,
+                          result_to_parse$AddressDetails$Country$CountryName,
+                          result_to_parse$AddressDetails$Country$AdministrativeArea$AdministrativeAreaName,
+                          result_to_parse$AddressDetails$Country$AdministrativeArea$Locality$LocalityName,
+                          result_to_parse$AddressDetails$Country$AdministrativeArea$Locality$Thoroughfare$ThoroughfareName,
+                          result_to_parse$AddressDetails$Country$AdministrativeArea$Locality$Thoroughfare$Premise$PremiseNumber), function(x) ifelse(is.null(x) == T, NA, x)))
+    return(found_add)
+  }
+  geocode_result <- lapply(x, geo_find)
+  geocode_result <- as.data.frame(do.call(rbind, geocode_result))
+  colnames(geocode_result) <- c('AddressLine', 'point',	'kind', 'precision', 'Country', 'AdministrativeAreaName',	'LocalityName',	'ThoroughfareName',	'PremiseNumber')
+  end_time <- Sys.time()
+  return(geocode_result)
+  print(end_time - start_time)
+}
