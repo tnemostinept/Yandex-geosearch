@@ -6,17 +6,16 @@ yandex_geocode <- function(x, apikey, ...) {
     #Combine a complete url for request
     geocode <- paste(unlist(strsplit(geocode, split = " ")), collapse = "+")
     if (rspn > 0 & is.null(bbox) == FALSE) {
-      coord1 <- unlist(strsplit(coord_left_low, split = ", "))
-      coord1 <- paste(coord1[2], coord1[1], sep = ",")
-      coord2 <- unlist(strsplit(coord_right_up, split = ", "))
-      coord2 <- paste(coord2[2], coord2[1], sep = ",")
-      url <- gsub(" ", "", paste('https://geocode-maps.yandex.ru/1.x?apikey=', apikey, "&geocode=", geocode, "&rspn=", rspn, "&bbox=", coord1, "~", coord2, collapse = ""))
+        coord1 <- unlist(strsplit(coord_left_low, split = ", "))
+        coord1 <- paste(coord1[2], coord1[1], sep = ",")
+        coord2 <- unlist(strsplit(coord_right_up, split = ", "))
+        coord2 <- paste(coord2[2], coord2[1], sep = ",")
+        url <- gsub(" ", "", paste('https://geocode-maps.yandex.ru/1.x?apikey=', apikey, "&geocode=", geocode, "&rspn=", rspn, "&bbox=", coord1, "~", coord2, collapse = ""))
       } else {
         url <- gsub(" ", "", paste('https://geocode-maps.yandex.ru/1.x?apikey=', apikey, "&geocode=", geocode, collapse = ""))
     }
     result <- as_list(read_xml(url))
     result_to_parse <- result$ymaps$GeoObjectCollection$featureMember$GeoObject$metaDataProperty$GeocoderMetaData
-    found_add <- vector('character', length = 9)
     found_add <- unlist(lapply(list(result_to_parse$text,
                           result[["ymaps"]][["GeoObjectCollection"]][["featureMember"]][["GeoObject"]][["Point"]][["pos"]][[1]],
                           result_to_parse$kind,
