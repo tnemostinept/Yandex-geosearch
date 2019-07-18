@@ -2,7 +2,7 @@ yandex_geosearch_bb <- function(x, coord_left_low, coord_right_up, apikey, expor
 require(jsonlite)
 require(openxlsx)
 #First, prepare request phrase and convert coordinates from 'lat, lon' into 'lon, lat' format
-  request <- paste(unlist(strsplit(x, split = " ")), collapse = "%20")
+  request <- URLencode(paste(unlist(strsplit(enc2utf8(x), split = " ")), collapse = "%20"))
   coord1 <- unlist(strsplit(coord_left_low, split = ","))
   coord1 <- paste(coord1[2], coord1[1], sep = ",")
   coord2 <- unlist(strsplit(coord_right_up, split = ","))
@@ -12,11 +12,14 @@ require(openxlsx)
   first_part <- "https://search-maps.yandex.ru/v1/?apikey="
   url_compl <- gsub(" ", "", paste(first_part, apikey, "&text=", request, "&type=biz&lang=ru_RU&", "bbox=", coord1, "~", coord2, "&results=500", collapse = ""))
 
-#Obtain a request results in json format, using right encoding  
-  full_req <- suppressWarnings(fromJSON(paste(readLines(url_compl, encoding = "UTF-8"), collapse="")))
+#Obtain a request results in json format  
+  full_req <- suppressWarnings(fromJSON(paste(readLines(url_compl, encoding = 'UTF-8'), collapse="")))
 
 #Desired results are stored in element, called 'feautures'. Here we take from there only name, address, url and coordinates of an object 
   req_data <- full_req$features
+  if (length(req_data) < 1) {
+    return('Nothing to show')
+  }
   prop <- req_data$properties
   geo <- req_data$geometry
   vec_geo <- unlist(geo$coordinates)
