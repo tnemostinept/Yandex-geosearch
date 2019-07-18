@@ -2,7 +2,7 @@ yandex_geosearch_bb <- function(x, coord_left_low, coord_right_up, apikey, expor
 require(jsonlite)
 require(openxlsx)
 #First, prepare request phrase and convert coordinates from 'lat, lon' into 'lon, lat' format
-  request <- URLencode(paste(unlist(strsplit(enc2utf8(x), split = " ")), collapse = "%20"))
+  request <- URLencode(enc2utf8(x))
   coord1 <- unlist(strsplit(coord_left_low, split = ","))
   coord1 <- paste(coord1[2], coord1[1], sep = ",")
   coord2 <- unlist(strsplit(coord_right_up, split = ","))
