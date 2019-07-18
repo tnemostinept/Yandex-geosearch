@@ -1,10 +1,11 @@
 yandex_geosearch_bb <- function(x, coord_left_low, coord_right_up, apikey, export = F) {
 require(jsonlite)
+require(openxlsx)
 #First, prepare request phrase and convert coordinates from 'lat, lon' into 'lon, lat' format
   request <- paste(unlist(strsplit(x, split = " ")), collapse = "%20")
-  coord1 <- unlist(strsplit(coord_left_low, split = ", "))
+  coord1 <- unlist(strsplit(coord_left_low, split = ","))
   coord1 <- paste(coord1[2], coord1[1], sep = ",")
-  coord2 <- unlist(strsplit(coord_right_up, split = ", "))
+  coord2 <- unlist(strsplit(coord_right_up, split = ","))
   coord2 <- paste(coord2[2], coord2[1], sep = ",")
   
 #Combine a complete url for request  
@@ -25,7 +26,7 @@ require(jsonlite)
   total <- cbind(prop$name, prop$description, prop$CompanyMetaData$url, geo_df)
   colnames(total) <- c("Name", "Address", "URL", "Lat", "Lon")
   if (export == TRUE) {
-    write.csv(total, 'request_api_result.csv')
+    write.xlsx(total, 'request_api_result.xlsx')
   }
   return(total)
 }
