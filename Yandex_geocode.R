@@ -1,4 +1,4 @@
-yandex_geocode <- function(x, apikey, ...) {
+yandex_geocode <- function(search_line, apikey, ...) {
   start_time <- Sys.time()
   require(tidyverse)
   require(xml2)
@@ -27,7 +27,8 @@ yandex_geocode <- function(x, apikey, ...) {
                           result_to_parse$AddressDetails$Country$AdministrativeArea$Locality$Thoroughfare$Premise$PremiseNumber), function(x) ifelse(is.null(x) == T, NA, x)))
     return(found_add)
   }
-  geocode_result <- lapply(x, geo_find)
+  geocode_result <- lapply(search_line, function(x) tryCatch(geo_find(x),
+                                                             error = function(e) 'error'))
   geocode_result <- as.data.frame(do.call(rbind, geocode_result))
   colnames(geocode_result) <- c('AddressLine', 'point',	'kind', 'precision', 'Country', 'AdministrativeAreaName',	'LocalityName',	'ThoroughfareName',	'PremiseNumber')
   end_time <- Sys.time()
