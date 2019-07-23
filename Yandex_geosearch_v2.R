@@ -3,9 +3,9 @@ require(jsonlite)
 require(openxlsx)
 #First, prepare request phrase and convert coordinates from 'lat, lon' into 'lon, lat' format
   request <- URLencode(enc2utf8(x))
-  coord1 <- unlist(strsplit(coord_left_low, split = ","))
+  coord1 <- unlist(strsplit(trimws(coord_left_low), split = ","))
   coord1 <- paste(coord1[2], coord1[1], sep = ",")
-  coord2 <- unlist(strsplit(coord_right_up, split = ","))
+  coord2 <- unlist(strsplit(trimws(coord_right_up), split = ","))
   coord2 <- paste(coord2[2], coord2[1], sep = ",")
   
 #Combine a complete url for request  
