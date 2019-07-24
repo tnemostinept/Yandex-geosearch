@@ -26,7 +26,7 @@ require(openxlsx)
   geo_df <- data.frame(lat = vec_geo[seq(2,length(vec_geo), by = 2)], lon = vec_geo[seq(1,length(vec_geo), by = 2)])
   
 #Combine our vectors in a dataframe and save it as csv if 'export' argument was set to 'TRUE'
-  total <- cbind(prop$name, prop$description, prop$CompanyMetaData$url, geo_df)
+  total <- cbind(prop$name, prop$description, ifelse(is.null(prop$CompanyMetaData$url) == TRUE, rep(NA, length(prop$name)), prop$CompanyMetaData$url), geo_df)
   colnames(total) <- c("Name", "Address", "URL", "Lat", "Lon")
   if (export == TRUE) {
     write.xlsx(total, 'request_api_result.xlsx')
