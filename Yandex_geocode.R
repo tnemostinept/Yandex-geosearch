@@ -10,10 +10,10 @@ yandex_geocode <- function(search_line, apikey, ...) {
         coord1 <- paste(coord1[2], coord1[1], sep = ",")
         coord2 <- unlist(strsplit(coord_right_up, split = ", "))
         coord2 <- paste(coord2[2], coord2[1], sep = ",")
-        url <- gsub(" ", "", paste('https://geocode-maps.yandex.ru/1.x?apikey=', apikey, "&geocode=", geocode, "&rspn=", rspn, "&bbox=", coord1, "~", coord2, collapse = ""))
+        url <- gsub(" ", "", paste('https://geocode-maps.yandex.ru/1.x?apikey=', apikey, "&geocode=", curl_escape(iconv(geocode,"UTF-8")), "&rspn=", rspn, "&bbox=", coord1, "~", coord2, collapse = ""))
       } else {
-        url <- gsub(" ", "", paste('https://geocode-maps.yandex.ru/1.x?apikey=', apikey, "&geocode=", geocode, collapse = ""))
-    }
+        url <- gsub(" ", "", paste('https://geocode-maps.yandex.ru/1.x?apikey=', apikey, "&geocode=", curl_escape(iconv(geocode,"UTF-8")), collapse = ""))
+      }
     result <- as_list(read_xml(url))
     result_to_parse <- result$ymaps$GeoObjectCollection$featureMember$GeoObject$metaDataProperty$GeocoderMetaData
     found_add <- unlist(lapply(list(result_to_parse$text,
